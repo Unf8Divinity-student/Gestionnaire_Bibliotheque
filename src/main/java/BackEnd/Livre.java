@@ -56,6 +56,6 @@ public class Livre {
 
     @Override
     public String toString() {
-        return String.format("[%s] %s écrit par %s | Status: %s - État: %s", this.ISBN, this.titre, this.auteur, this.statut, this.etatPhisique);
+        return String.format("ID: %d [%s] %s écrit par %s | Status: %s - État: %s",this.id, this.ISBN, this.titre, this.auteur, this.statut, this.etatPhisique);
     }
 }
