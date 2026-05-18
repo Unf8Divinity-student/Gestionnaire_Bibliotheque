@@ -4,20 +4,20 @@ import javafx.fxml.Initializable;
 import javafx.stage.Stage;
 
 public class Livre {
-    private static int nombreUnique = 0;
+
 
     private String titre;
     private String auteur;
     private String ISBN;
-    private int id;
+    private int id; // # d'exemplaire (1-2-3-4)
     private Statut statut;
     private EtatPhisique etatPhisique;
 
-    public  Livre(String titre, String auteur, String ISBN, Statut statut, EtatPhisique etatPhisique) {
+    public  Livre(String titre, String auteur, String ISBN, int id, Statut statut, EtatPhisique etatPhisique) {
         this.titre = titre;
         this.auteur = auteur;
         this.ISBN = ISBN;
-        this.id = nombreUnique++;
+        this.id = id;
         this.statut = statut;
         this.etatPhisique = etatPhisique;
     }
@@ -56,6 +56,6 @@ public class Livre {
 
     @Override
     public String toString() {
-        return String.format("ID: %d [%s] %s écrit par %s | Status: %s - État: %s",this.id, this.ISBN, this.titre, this.auteur, this.statut, this.etatPhisique);
+        return String.format("[%s] %s écrit par %s exemplaire #%d | Status: %s - État: %s", this.ISBN, this.titre, this.auteur, this.id, this.statut, this.etatPhisique);
     }
 }
