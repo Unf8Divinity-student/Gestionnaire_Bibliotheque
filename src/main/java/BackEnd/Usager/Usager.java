@@ -17,6 +17,7 @@ public class Usager {
 
     public Usager(String nom, int limiteEmprunt, int dureeEmprunt) {
         this.id = count.getAndIncrement();
+        this.nom = nom;
         this.limiteEmprunt = limiteEmprunt;
         this.dureeEmprunt = dureeEmprunt;
     }
