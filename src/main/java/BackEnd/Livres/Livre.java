@@ -1,7 +1,4 @@
-package BackEnd;
-
-import javafx.fxml.Initializable;
-import javafx.stage.Stage;
+package BackEnd.Livres;
 
 public class Livre {
 
@@ -56,6 +53,6 @@ public class Livre {
 
     @Override
     public String toString() {
-        return String.format("[%s] %s écrit par %s exemplaire #%d | Status: %s - État: %s", this.ISBN, this.titre, this.auteur, this.id, this.statut, this.etatPhisique);
+        return String.format("[%s] %s écrit par %s - exemplaire #%d | Status: %s - État: %s", this.ISBN, this.titre, this.auteur, this.id, this.statut, this.etatPhisique);
     }
 }

@@ -1,4 +1,4 @@
-package BackEnd;
+package BackEnd.Livres;
 
 public enum Statut {
     DISPONIBLE("Disponible"),

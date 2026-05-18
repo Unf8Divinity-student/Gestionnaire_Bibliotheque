@@ -1,8 +1,5 @@
 package BackEnd.Usager;
 
-import BackEnd.Livre;
-
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Usager {
