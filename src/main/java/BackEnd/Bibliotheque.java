@@ -1,5 +1,6 @@
 package BackEnd;
 
+import BackEnd.Livres.EtatPhisique;
 import BackEnd.Livres.Statut;
 import BackEnd.Usager.*;
 import BackEnd.Livres.Livre;
@@ -125,6 +126,7 @@ public class Bibliotheque {
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre)).setStatut(Statut.DISPONIBLE);
         } else {
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre)).setStatut(Statut.A_REPARER);
+            listeLivres.get(listeLivres.indexOf(emprunt.getLivre)).setEtatPhisique(EtatPhisique.A_REPARER);
             listeReparer.add(emprunt.getLivre);
         }
         emprunt.getUser().reduceNombreEmprunt();
