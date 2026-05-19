@@ -3,14 +3,18 @@ package BackEnd;
 import BackEnd.Livres.Statut;
 import BackEnd.Usager.*;
 import BackEnd.Livres.Livre;
-
+import java.util.Random;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Bibliotheque {
+
+    AtomicInteger totalemprunt;
 
     private ArrayList<Livre> listeLivres;
     private ArrayList<Usager> listeUsager;
@@ -20,6 +24,11 @@ public class Bibliotheque {
         this.listeLivres = new ArrayList<>();
         this.listeUsager = new ArrayList<>();
         this.listeEmprunt = new ArrayList<>();
+        this.totalemprunt = new AtomicInteger(0);
+    }
+
+    public AtomicInteger getTotalemprunt() {
+        return totalemprunt;
     }
 
     // ######### methode listeUsager #########
@@ -64,6 +73,8 @@ public class Bibliotheque {
 
             listeLivres.get(listeLivres.indexOf(livre)).setStatut(Statut.EMPRUNTE);
             listeEmprunt.add(new Emprunt(livre, user, today, dateDeRetour(user), 0));
+            user.addNombreEmprunt();
+            totalemprunt.getAndIncrement();
         }
     }
 
@@ -106,5 +117,25 @@ public class Bibliotheque {
                 .toList();
 
         return listeEmpruntUser.contains(livre.getISBN());
+    }
+
+    // ######### gestion des retours #########
+    public void retourDeLivre(Emprunt emprunt) {
+        if (!estBrise()) {
+            listeLivres.get(listeLivres.indexOf(emprunt.getLivre)).setStatut(Statut.DISPONIBLE);
+        } else {
+            listeLivres.get(listeLivres.indexOf(emprunt.getLivre)).setStatut(Statut.A_REPARER);
+            listeReparer.add(emprunt.getLivre);
+        }
+        emprunt.getUser().reduceNombreEmprunt();
+        listeEmprunt.remove(emprunt);
+    }
+
+    // ######### générateur de bris #########
+    private boolean estBrise() {
+        Random random = new Random();
+        int nb = random.nextInt(1, 11);
+
+        return nb == 1; // 10% de chance de tomber sur 1
     }
 }

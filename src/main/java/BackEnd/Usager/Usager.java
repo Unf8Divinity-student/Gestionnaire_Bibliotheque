@@ -35,6 +35,14 @@ public class Usager {
         return nombreEmprunt;
     }
 
+    public synchronized void addNombreEmprunt(){
+        this.nombreEmprunt++;
+    }
+
+    public synchronized void reduceNombreEmprunt(){
+        this.nombreEmprunt--;
+    }
+
     public int getDureeEmprunt() {
         return dureeEmprunt;
     }

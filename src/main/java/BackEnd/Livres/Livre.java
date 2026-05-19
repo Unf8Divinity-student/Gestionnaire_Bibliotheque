@@ -39,7 +39,7 @@ public class Livre {
         return statut;
     }
 
-    public void setStatut(Statut statut) {
+    public synchronized void setStatut(Statut statut) {
         this.statut = statut;
     }
 
@@ -47,7 +47,7 @@ public class Livre {
         return etatPhisique;
     }
 
-    public void setEtatPhisique(EtatPhisique etatPhisique) {
+    public synchronized void setEtatPhisique(EtatPhisique etatPhisique) {
         this.etatPhisique = etatPhisique;
     }
 
