@@ -18,11 +18,13 @@ public class Bibliotheque {
     private ArrayList<Livre> listeLivres;
     private ArrayList<Usager> listeUsager;
     private ArrayList<Emprunt> listeEmprunt;
+    private ArrayList<Livre> listeBrise;
 
     public Bibliotheque() throws IOException {
         this.listeLivres = new ArrayList<>();
         this.listeUsager = new ArrayList<>();
         this.listeEmprunt = new ArrayList<>();
+        this.listeBrise = new ArrayList<>();
         this.totalemprunt = new AtomicInteger(0);
     }
 
@@ -125,7 +127,7 @@ public class Bibliotheque {
         } else {
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.A_REPARER);
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.A_REPARER);
-            listeReparer.add(emprunt.getLivre());
+            listeBrise.add(emprunt.getLivre());
         }
         emprunt.getUser().reduceNombreEmprunt();
         listeEmprunt.remove(emprunt);
@@ -137,5 +139,13 @@ public class Bibliotheque {
         int nb = random.nextInt(1, 11);
 
         return nb == 1; // 10% de chance de tomber sur 1
+    }
+
+    public ArrayList<Livre> getListeBrise() {
+        return this.listeBrise;
+    }
+
+    public void livreRepare(Livre livre) {
+        this.listeBrise.remove(livre);
     }
 }

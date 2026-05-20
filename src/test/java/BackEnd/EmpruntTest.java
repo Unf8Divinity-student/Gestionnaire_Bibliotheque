@@ -1,5 +1,8 @@
 package BackEnd;
 
+import BackEnd.Livres.EtatPhisique;
+import BackEnd.Livres.Livre;
+import BackEnd.Livres.Statut;
 import BackEnd.Usager.Professeur;
 import BackEnd.Usager.Usager;
 import org.junit.jupiter.api.Test;
