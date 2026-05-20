@@ -1,5 +1,6 @@
 package BackEnd;
 
+import BackEnd.Livres.Livre;
 import BackEnd.Usager.Usager;
 
 import java.time.LocalDate;

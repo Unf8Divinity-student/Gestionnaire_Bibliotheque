@@ -4,13 +4,11 @@ import BackEnd.Livres.EtatPhisique;
 import BackEnd.Livres.Statut;
 import BackEnd.Usager.*;
 import BackEnd.Livres.Livre;
-import java.util.Random;
+import BackEnd.Emprunt;
+
+import java.util.*;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Bibliotheque {
@@ -52,7 +50,7 @@ public class Bibliotheque {
     // ######### methode listeLivre #########
     public synchronized void nouveauFichierMarc() throws IOException {
         MarcParser parser = new MarcParser();
-        listeLivres = parser.chargerFichierMarc(getClass().getResource("/Cegep.iso2709").getPath());
+        listeLivres = parser.chargerFichierMarc(Objects.requireNonNull(getClass().getResource("/Cegep.iso2709")).getPath());
     }
 
     public synchronized void ajouterFichierMarc(String chemin) throws IOException {
@@ -95,7 +93,7 @@ public class Bibliotheque {
 
     // calcul de condition d'emprunt
     public boolean peuxEmprunter(Livre livre, Usager user) {
-        List<Emprunt> listeEmpruntUser = listeEmprunt.stream().filter(e -> e.getUser == user).toList(); // donne la liste d'emprunt de l'usager
+        List<Emprunt> listeEmpruntUser = listeEmprunt.stream().filter(e -> e.getUser() == user).toList(); // donne la liste d'emprunt de l'usager
 
         return (listeEmpruntUser.size() < user.getLimiteEmprunt() && pasDeRetard(user) && pasDejaEmprunt(livre, user) && livre.getStatut() == Statut.DISPONIBLE);
     }
@@ -103,8 +101,8 @@ public class Bibliotheque {
     // détermine si user à un retard de retour
     private boolean pasDeRetard(Usager user) {
         int enRetard = listeEmprunt.stream()
-                .filter(e -> e.getUser == user)
-                .mapToInt(e -> e.getRetard)
+                .filter(e -> e.getUser() == user)
+                .mapToInt(Emprunt::getRetard)
                 .sum();
 
         return enRetard == 0;
@@ -113,8 +111,8 @@ public class Bibliotheque {
     // determine si user à deja le livre dans ses emprunt
     private boolean pasDejaEmprunt (Livre livre, Usager user) {
         List<String> listeEmpruntUser = listeEmprunt.stream()
-                .filter(e -> e.getUser == user)
-                .map(e -> e.getISBN)
+                .filter(e -> e.getUser() == user)
+                .map(e -> e.getLivre().getISBN())
                 .toList();
 
         return listeEmpruntUser.contains(livre.getISBN());
@@ -123,11 +121,11 @@ public class Bibliotheque {
     // ######### gestion des retours #########
     public void retourDeLivre(Emprunt emprunt) {
         if (!estBrise()) {
-            listeLivres.get(listeLivres.indexOf(emprunt.getLivre)).setStatut(Statut.DISPONIBLE);
+            listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.DISPONIBLE);
         } else {
-            listeLivres.get(listeLivres.indexOf(emprunt.getLivre)).setStatut(Statut.A_REPARER);
-            listeLivres.get(listeLivres.indexOf(emprunt.getLivre)).setEtatPhisique(EtatPhisique.A_REPARER);
-            listeReparer.add(emprunt.getLivre);
+            listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.A_REPARER);
+            listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.A_REPARER);
+            listeReparer.add(emprunt.getLivre());
         }
         emprunt.getUser().reduceNombreEmprunt();
         listeEmprunt.remove(emprunt);
