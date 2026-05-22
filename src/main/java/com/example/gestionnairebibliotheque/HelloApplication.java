@@ -12,6 +12,7 @@ import java.io.IOException;
 
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
 
@@ -53,6 +54,9 @@ public class HelloApplication extends Application {
                 .entrySet().stream()
                 .sorted(Map.Entry.comparingByKey())
                 .forEach(e -> System.out.println(e.getKey() + " exemplaire(s) : " + e.getValue() + " livres"));
+
+
+
     }
 
         /*
@@ -63,5 +67,7 @@ public class HelloApplication extends Application {
         stage.show();
     }
          */
+
+
 
 }

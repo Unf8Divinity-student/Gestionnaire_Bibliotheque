@@ -4,16 +4,19 @@ import BackEnd.Livres.EtatPhisique;
 import BackEnd.Livres.Statut;
 import BackEnd.Usager.*;
 import BackEnd.Livres.Livre;
-import BackEnd.Emprunt;
 
 import java.util.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
+import static java.lang.Integer.parseInt;
+import static java.util.stream.Collectors.groupingBy;
 
 public class Bibliotheque {
 
-    AtomicInteger totalemprunt;
+    AtomicInteger totalEmprunt;
 
     private ArrayList<Livre> listeLivres;
     private ArrayList<Usager> listeUsager;
@@ -25,11 +28,11 @@ public class Bibliotheque {
         this.listeUsager = new ArrayList<>();
         this.listeEmprunt = new ArrayList<>();
         this.listeBrise = new ArrayList<>();
-        this.totalemprunt = new AtomicInteger(0);
+        this.totalEmprunt = new AtomicInteger(0);
     }
 
-    public AtomicInteger getTotalemprunt() {
-        return totalemprunt;
+    public AtomicInteger getTotalEmprunt() {
+        return totalEmprunt;
     }
 
     // ######### methode listeUsager #########
@@ -75,7 +78,7 @@ public class Bibliotheque {
             listeLivres.get(listeLivres.indexOf(livre)).setStatut(Statut.EMPRUNTE);
             listeEmprunt.add(new Emprunt(livre, user, today, dateDeRetour(user), 0));
             user.addNombreEmprunt();
-            totalemprunt.getAndIncrement();
+            totalEmprunt.getAndIncrement();
         }
     }
 
@@ -155,5 +158,55 @@ public class Bibliotheque {
         this.listeLivres.get(listeLivres.indexOf(livre)).setStatut(Statut.DISPONIBLE);
         this.listeLivres.get(listeLivres.indexOf(livre)).setEtatPhisique(EtatPhisique.USE);
         this.listeLivres.get(listeLivres.indexOf(livre)).setAEteRepare(true);
+    }
+
+    // ################## FILTRES ##################
+        // listelivres
+
+        // par titre
+    public final List<Livre> PAR_TITRE(String titre) {
+        return this.listeLivres.stream()
+                .parallel()
+                .filter(e -> Objects.equals(e.getTitre().toLowerCase(), titre.toLowerCase()))
+                .sorted()
+                .toList();
+    }
+
+        // par auteur
+    public final List<Livre> PAR_AUTEUR(String auteur) {
+        return this.listeLivres.stream()
+                .parallel()
+                .filter(e -> Objects.equals(e.getAuteur().toLowerCase(), auteur.toLowerCase()))
+                .sorted()
+                .toList();
+    }
+
+        // par disponibilité
+    public final List<Livre> DISPONIBLE() {
+        return this.listeLivres.stream()
+                .parallel()
+                .filter(e -> e.getStatut() == Statut.DISPONIBLE)
+                .toList();
+    }
+
+        // stats emprunt par par userType
+    public Map<Class<? extends Usager>, Long> userTypeStat() {
+        return this.listeEmprunt.parallelStream()
+                .map(e -> e.getUser().getClass())
+                .collect(Collectors.groupingBy(c -> c, Collectors.counting()));
+    }
+
+    // ################## Emprunt en retard ##################
+    public List<Emprunt> getRetard() {
+        return listeEmprunt.parallelStream()
+                .filter(e-> e.getDateRetour().plusDays(1).isBefore(LocalDate.now()))
+                .toList();
+    }
+
+    // ################## affichage titre seulement #################
+    public List<String> afficherTitre(List<Livre> list) {
+        return list.parallelStream()
+                .map(Livre::getTitre)
+                .toList();
     }
 }

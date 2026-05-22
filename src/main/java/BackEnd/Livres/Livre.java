@@ -1,6 +1,8 @@
 package BackEnd.Livres;
 
-public class Livre {
+import java.util.Comparator;
+
+public class Livre implements Comparable<Livre> {
 
 
     private String titre;
@@ -63,5 +65,10 @@ public class Livre {
     @Override
     public String toString() {
         return String.format("[%s] %s écrit par %s - exemplaire #%d | Status: %s - État: %s", this.ISBN, this.titre, this.auteur, this.id, this.statut, this.etatPhisique);
+    }
+
+    @Override
+    public int compareTo(Livre o) {
+        return this.getTitre().toLowerCase().compareTo(o.getTitre().toLowerCase());
     }
 }
