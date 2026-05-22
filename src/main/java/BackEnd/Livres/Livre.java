@@ -9,6 +9,7 @@ public class Livre {
     private int id; // # d'exemplaire (1-2-3-4)
     private Statut statut;
     private EtatPhisique etatPhisique;
+    private boolean AEteRepare = false;
 
     public  Livre(String titre, String auteur, String ISBN, int id, Statut statut, EtatPhisique etatPhisique) {
         this.titre = titre;
@@ -49,6 +50,14 @@ public class Livre {
 
     public synchronized void setEtatPhisique(EtatPhisique etatPhisique) {
         this.etatPhisique = etatPhisique;
+    }
+
+    public boolean getAEteRepare() {
+        return this.AEteRepare;
+    }
+
+    public void setAEteRepare(boolean aEteRepare) {
+        this.AEteRepare = aEteRepare;
     }
 
     @Override

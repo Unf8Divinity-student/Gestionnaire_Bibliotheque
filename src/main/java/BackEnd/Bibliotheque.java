@@ -124,6 +124,11 @@ public class Bibliotheque {
     public void retourDeLivre(Emprunt emprunt) {
         if (!estBrise()) {
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.DISPONIBLE);
+            if (emprunt.getLivre().getAEteRepare()) {
+                listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.USE);
+            } else {
+                listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.BON);
+            }
         } else {
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.A_REPARER);
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.A_REPARER);
@@ -145,7 +150,10 @@ public class Bibliotheque {
         return this.listeBrise;
     }
 
-    public void livreRepare(Livre livre) {
+    public synchronized void livreRepare(Livre livre) {
         this.listeBrise.remove(livre);
+        this.listeLivres.get(listeLivres.indexOf(livre)).setStatut(Statut.DISPONIBLE);
+        this.listeLivres.get(listeLivres.indexOf(livre)).setEtatPhisique(EtatPhisique.USE);
+        this.listeLivres.get(listeLivres.indexOf(livre)).setAEteRepare(true);
     }
 }
