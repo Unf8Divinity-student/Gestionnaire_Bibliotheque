@@ -186,10 +186,11 @@ public class Bibliotheque {
         return this.listeLivres.stream()
                 .parallel()
                 .filter(e -> e.getStatut() == Statut.DISPONIBLE)
+                .sorted()
                 .toList();
     }
 
-        // stats emprunt par par userType
+        // stats emprunt par userType
     public Map<Class<? extends Usager>, Long> userTypeStat() {
         return this.listeEmprunt.parallelStream()
                 .map(e -> e.getUser().getClass())
@@ -199,7 +200,8 @@ public class Bibliotheque {
     // ################## Emprunt en retard ##################
     public List<Emprunt> getRetard() {
         return listeEmprunt.parallelStream()
-                .filter(e-> e.getDateRetour().plusDays(1).isBefore(LocalDate.now()))
+                .filter(e-> e.getDateRetour().isBefore(LocalDate.now()))
+                .sorted((e1, e2) -> e1.getDateRetour().compareTo(e2.getDateRetour()))
                 .toList();
     }
 
