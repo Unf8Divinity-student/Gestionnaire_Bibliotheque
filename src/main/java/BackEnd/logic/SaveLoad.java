@@ -26,7 +26,7 @@ public class SaveLoad {
                 .create();
     }
 
-    static synchronized void save(ArrayList<Livre> listeLivres, ArrayList<Emprunt> listeEmprunt, ArrayList<Usager> listeUsager, ArrayList<Livre> livreBrise, AtomicInteger totalEmprunt) throws IOException{
+    static synchronized void save(ArrayList<Livre> listeLivres, ArrayList<Emprunt> listeEmprunt, ArrayList<Usager> listeUsager, ArrayList<Livre> livreBrise, AtomicInteger totalEmprunt, RetourDeLivre retour, ReparationTerminer reparation) throws IOException{
         Gson gson = buildGson();
 
         // objet pour encapsuler tout les object à sauvegarder
@@ -37,6 +37,8 @@ public class SaveLoad {
         data.add("livreBrise", gson.toJsonTree(livreBrise));
         data.addProperty("totalEmprunt", totalEmprunt.get());
         data.addProperty("userCount", Usager.getCount());
+        data.add("dernierScanRetour",  gson.toJsonTree(retour.getDernierScan()));
+        data.add("dernierScanReparation", gson.toJsonTree(reparation.getDernierScan()));
 
         // responsabilité du catch à l'appellant
         try (FileWriter writer = new FileWriter("bibliotheque.json", StandardCharsets.UTF_8)) {
@@ -44,7 +46,7 @@ public class SaveLoad {
         }
     }
 
-    static synchronized boolean load(Bibliotheque bibliotheque) throws IOException {
+    static synchronized boolean load(Bibliotheque bibliotheque, RetourDeLivre retour, ReparationTerminer reparation) throws IOException {
         File file = new File("bibliotheque.json");
         if (file.exists()) {
 
@@ -65,6 +67,8 @@ public class SaveLoad {
                 }.getType()));
                 bibliotheque.setTotalEmprunt(new AtomicInteger(json.get("totalEmprunt").getAsInt()));
                 Usager.setCount(new AtomicInteger(json.get("userCount").getAsInt()));
+                retour.setDernierScan(gson.fromJson(json.get("dernierScanRetour"), LocalDate.class));
+                reparation.setDernierScan(gson.fromJson(json.get("dernierScanReparation"), LocalDate.class));
             }
             return true;
         }
