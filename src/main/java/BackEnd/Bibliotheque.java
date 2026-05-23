@@ -22,7 +22,7 @@ public class Bibliotheque implements Serializable {
     private ArrayList<Livre> listeLivres;
     private ArrayList<Usager> listeUsager;
     private ArrayList<Emprunt> listeEmprunt;
-    private ArrayList<Livre> listeBrise;
+    private ArrayList<Emprunt> listeBrise;
 
     public Bibliotheque() throws IOException {
         this.listeLivres = new ArrayList<>();
@@ -160,7 +160,7 @@ public class Bibliotheque implements Serializable {
         } else {
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.A_REPARER);
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.A_REPARER);
-            listeBrise.add(emprunt.getLivre());
+            listeBrise.add(emprunt);
         }
         emprunt.getUser().reduceNombreEmprunt();
         listeEmprunt.remove(emprunt);
@@ -175,20 +175,20 @@ public class Bibliotheque implements Serializable {
         return nb == 1; // 10% de chance de tomber sur 1
     }
 
-    public ArrayList<Livre> getListeBrise() {
+    public ArrayList<Emprunt> getListeBrise() {
         return this.listeBrise;
     }
 
     // pas sync car SaveLoad.load() est déja sync et unique appelleur de cette méthode
-    public void setListeBrise(ArrayList<Livre> listeBrise) {
+    public void setListeBrise(ArrayList<Emprunt> listeBrise) {
         this.listeBrise = listeBrise;
     }
 
-    public synchronized void livreRepare(Livre livre) {
-        this.listeBrise.remove(livre);
-        this.listeLivres.get(listeLivres.indexOf(livre)).setStatut(Statut.DISPONIBLE);
-        this.listeLivres.get(listeLivres.indexOf(livre)).setEtatPhisique(EtatPhisique.USE);
-        this.listeLivres.get(listeLivres.indexOf(livre)).setAEteRepare(true);
+    public synchronized void livreRepare(Emprunt emprunt) {
+        this.listeBrise.remove(emprunt);
+        this.listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.DISPONIBLE);
+        this.listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.USE);
+        this.listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setAEteRepare(true);
     }
 
     // ################## FILTRES ##################
