@@ -23,6 +23,15 @@ public class Usager {
         return id;
     }
 
+    // ### static get and set pour load ###
+    public static AtomicInteger getCount() {
+        return count;
+    }
+
+    public static void setCount(AtomicInteger valeur) {
+        count = valeur;
+    }
+
     public String getNom() {
         return nom;
     }

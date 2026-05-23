@@ -4,19 +4,30 @@ import BackEnd.Bibliotheque;
 import BackEnd.Emprunt;
 import BackEnd.Livres.Livre;
 import BackEnd.Usager.Usager;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class SaveLoad {
+
+    // custum GsonBuilder pour LocalDate (non sérialisable)
+    private static Gson buildGson() {
+        return new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>)
+                        (date, type, ctx) -> new JsonPrimitive(date.toString()))
+                .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>)
+                        (json, type, ctx) -> LocalDate.parse(json.getAsJsonPrimitive().getAsString()))
+                .create();
+    }
+
     static synchronized void save(ArrayList<Livre> listeLivres, ArrayList<Emprunt> listeEmprunt, ArrayList<Usager> listeUsager, ArrayList<Livre> livreBrise, AtomicInteger totalEmprunt) throws IOException{
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Gson gson = buildGson();
 
         // objet pour encapsuler tout les object à sauvegarder
         JsonObject data = new JsonObject();
@@ -25,6 +36,7 @@ public class SaveLoad {
         data.add("usager", gson.toJsonTree(listeUsager));
         data.add("livreBrise", gson.toJsonTree(livreBrise));
         data.addProperty("totalEmprunt", totalEmprunt.get());
+        data.addProperty("userCount", Usager.getCount());
 
         // responsabilité du catch à l'appellant
         try (FileWriter writer = new FileWriter("bibliotheque.json", StandardCharsets.UTF_8)) {
@@ -36,8 +48,9 @@ public class SaveLoad {
         File file = new File("bibliotheque.json");
         if (file.exists()) {
 
-            Gson gson = new Gson();
+            Gson gson = buildGson();
 
+            // responsabilité du catch à l'appellant
             try (FileReader reader = new FileReader("bibliotheque.json", StandardCharsets.UTF_8)) {
                 JsonObject json = gson.fromJson(reader, JsonObject.class);
 
@@ -50,7 +63,8 @@ public class SaveLoad {
                 }.getType()));
                 bibliotheque.setListeBrise(gson.fromJson(json.get("livreBrise"), new TypeToken<ArrayList<Livre>>() {
                 }.getType()));
-                bibliotheque.setTotalEmprunt(new AtomicInteger((json.get("totalEmprunt").getAsInt())));
+                bibliotheque.setTotalEmprunt(new AtomicInteger(json.get("totalEmprunt").getAsInt()));
+                Usager.setCount(new AtomicInteger(json.get("userCount").getAsInt()));
             }
             return true;
         }

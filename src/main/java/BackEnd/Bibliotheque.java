@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.groupingBy;
 
 public class Bibliotheque implements Serializable {
 
-    AtomicInteger totalEmprunt;
+    private AtomicInteger totalEmprunt;
 
     private ArrayList<Livre> listeLivres;
     private ArrayList<Usager> listeUsager;
