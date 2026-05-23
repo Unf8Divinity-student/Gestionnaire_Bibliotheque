@@ -3,9 +3,10 @@ package BackEnd;
 import BackEnd.Livres.Livre;
 import BackEnd.Usager.Usager;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Emprunt {
+public class Emprunt implements Serializable {
     private Livre livre;
     private Usager user;
     private LocalDate dateEmprunt;

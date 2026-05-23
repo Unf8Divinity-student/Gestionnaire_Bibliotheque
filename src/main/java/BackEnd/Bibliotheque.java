@@ -5,6 +5,7 @@ import BackEnd.Livres.Statut;
 import BackEnd.Usager.*;
 import BackEnd.Livres.Livre;
 
+import java.io.Serializable;
 import java.util.*;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 import static java.lang.Integer.parseInt;
 import static java.util.stream.Collectors.groupingBy;
 
-public class Bibliotheque {
+public class Bibliotheque implements Serializable {
 
     AtomicInteger totalEmprunt;
 
@@ -35,9 +36,19 @@ public class Bibliotheque {
         return totalEmprunt;
     }
 
+    // pas sync car SaveLoad.load() est déja sync et unique appelleur de cette méthode
+    public void setTotalEmprunt(AtomicInteger totalEmprunt) {
+        this.totalEmprunt = totalEmprunt;
+    }
+
     // ######### methode listeUsager #########
     public ArrayList<Usager> getListeUsager() {
         return this.listeUsager;
+    }
+
+    // pas sync car SaveLoad.load() est déja sync et unique appelleur de cette méthode
+    public void setListeUsager(ArrayList<Usager> listeUsager) {
+        this.listeUsager = listeUsager;
     }
 
     public synchronized void addUser(userType type, String nom) {
@@ -67,8 +78,22 @@ public class Bibliotheque {
         return this.listeLivres;
     }
 
+    // pas sync car SaveLoad.load() est déja sync et unique appelleur de cette méthode
+    public void setListeLivres(ArrayList<Livre> listeLivres) {
+        this.listeLivres = listeLivres;
+    }
+
 
     // ######### gestion d'emprunt #########
+
+    public ArrayList<Emprunt> getListeEmprunt() {
+        return this.listeEmprunt;
+    }
+
+    // pas sync car SaveLoad.load() est déja sync et unique appelleur de cette méthode
+    public void setListeEmprunt(ArrayList<Emprunt> listeEmprunt) {
+        this.listeEmprunt = listeEmprunt;
+    }
 
     // fonciton principale emprunt
     public synchronized void emprunt(Livre livre, Usager user) {
@@ -141,7 +166,8 @@ public class Bibliotheque {
         listeEmprunt.remove(emprunt);
     }
 
-    // ######### générateur de bris #########
+    // ######### méthode de bris #########
+        // générateur de bris
     private boolean estBrise() {
         Random random = new Random();
         int nb = random.nextInt(1, 11);
@@ -151,6 +177,11 @@ public class Bibliotheque {
 
     public ArrayList<Livre> getListeBrise() {
         return this.listeBrise;
+    }
+
+    // pas sync car SaveLoad.load() est déja sync et unique appelleur de cette méthode
+    public void setListeBrise(ArrayList<Livre> listeBrise) {
+        this.listeBrise = listeBrise;
     }
 
     public synchronized void livreRepare(Livre livre) {

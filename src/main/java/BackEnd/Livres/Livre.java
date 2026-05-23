@@ -1,8 +1,9 @@
 package BackEnd.Livres;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class Livre implements Comparable<Livre> {
+public class Livre implements Comparable<Livre>, Serializable {
 
 
     private String titre;
