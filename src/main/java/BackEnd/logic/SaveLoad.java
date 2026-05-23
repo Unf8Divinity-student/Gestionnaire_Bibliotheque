@@ -26,16 +26,16 @@ public class SaveLoad {
                 .create();
     }
 
-    static synchronized void save(ArrayList<Livre> listeLivres, ArrayList<Emprunt> listeEmprunt, ArrayList<Usager> listeUsager, ArrayList<Livre> livreBrise, AtomicInteger totalEmprunt, RetourDeLivre retour, ReparationTerminer reparation) throws IOException{
+    static synchronized void save(Bibliotheque bibliotheque, RetourDeLivre retour, ReparationTerminer reparation) throws IOException{
         Gson gson = buildGson();
 
         // objet pour encapsuler tout les object à sauvegarder
         JsonObject data = new JsonObject();
-        data.add("livres", gson.toJsonTree(listeLivres));
-        data.add("emprunt", gson.toJsonTree(listeEmprunt));
-        data.add("usager", gson.toJsonTree(listeUsager));
-        data.add("livreBrise", gson.toJsonTree(livreBrise));
-        data.addProperty("totalEmprunt", totalEmprunt.get());
+        data.add("livres", gson.toJsonTree(bibliotheque.getListeLivres()));
+        data.add("emprunt", gson.toJsonTree(bibliotheque.getListeEmprunt()));
+        data.add("usager", gson.toJsonTree(bibliotheque.getListeUsager()));
+        data.add("livreBrise", gson.toJsonTree(bibliotheque.getListeBrise()));
+        data.addProperty("totalEmprunt", bibliotheque.getTotalEmprunt());
         data.addProperty("userCount", Usager.getCount());
         data.add("dernierScanRetour",  gson.toJsonTree(retour.getDernierScan()));
         data.add("dernierScanReparation", gson.toJsonTree(reparation.getDernierScan()));
