@@ -22,7 +22,7 @@ public class Bibliotheque implements Serializable {
     private ArrayList<Livre> listeLivres;
     private ArrayList<Usager> listeUsager;
     private ArrayList<Emprunt> listeEmprunt;
-    private ArrayList<Emprunt> listeBrise;
+    private ArrayList<Livre> listeBrise;
 
     public Bibliotheque() throws IOException {
         this.listeLivres = new ArrayList<>();
@@ -53,9 +53,9 @@ public class Bibliotheque implements Serializable {
 
     public synchronized void addUser(userType type, String nom) {
         switch (type) {
-            case ETUDIANT: listeUsager.add(new Etudiant(nom));
-            case PROFESSEUR: listeUsager.add(new Professeur(nom));
-            case VISITEUR: listeUsager.add(new Visiteur(nom));
+            case ETUDIANT -> listeUsager.add(new Etudiant(nom));
+            case PROFESSEUR -> listeUsager.add(new Professeur(nom));
+            case VISITEUR -> listeUsager.add(new Visiteur(nom));
         }
     }
 
@@ -114,8 +114,8 @@ public class Bibliotheque implements Serializable {
 
         // si fin de semaine (FERMER)
         switch(dateRetour.getDayOfWeek()) {
-            case SATURDAY -> dateRetour.plusDays(2);
-            case SUNDAY -> dateRetour.plusDays(1);
+            case SATURDAY -> dateRetour = dateRetour.plusDays(2);
+            case SUNDAY -> dateRetour = dateRetour.plusDays(1);
         }
 
         return dateRetour;
@@ -140,16 +140,15 @@ public class Bibliotheque implements Serializable {
 
     // determine si user à deja le livre dans ses emprunt
     private boolean pasDejaEmprunt (Livre livre, Usager user) {
-        List<String> listeEmpruntUser = listeEmprunt.stream()
+
+        return listeEmprunt.stream()
                 .filter(e -> e.getUser() == user)
                 .map(e -> e.getLivre().getISBN())
-                .toList();
-
-        return listeEmpruntUser.contains(livre.getISBN());
+                .noneMatch(e -> Objects.equals(e, livre.getISBN()));
     }
 
     // ######### gestion des retours #########
-    public void retourDeLivre(Emprunt emprunt) {
+    public synchronized void retourDeLivre(Emprunt emprunt) {
         if (!estBrise()) {
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.DISPONIBLE);
             if (emprunt.getLivre().getAEteRepare()) {
@@ -160,7 +159,8 @@ public class Bibliotheque implements Serializable {
         } else {
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.A_REPARER);
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.A_REPARER);
-            listeBrise.add(emprunt);
+            listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setDateDisponibilite(calculDateDisponibilite());
+            listeBrise.add(listeLivres.get(listeLivres.indexOf(emprunt.getLivre())));
         }
         emprunt.getUser().reduceNombreEmprunt();
         listeEmprunt.remove(emprunt);
@@ -175,20 +175,38 @@ public class Bibliotheque implements Serializable {
         return nb == 1; // 10% de chance de tomber sur 1
     }
 
-    public ArrayList<Emprunt> getListeBrise() {
+        // calcul dateDisponibilite apres bris
+    private LocalDate calculDateDisponibilite() {
+        int dureReparation = 3;
+        LocalDate dateDisponibilite = LocalDate.now().plusDays(dureReparation);
+
+        for (int i = 1; i <= dureReparation; i++) {
+            switch (LocalDate.now().plusDays(i).getDayOfWeek()) {
+                case SATURDAY -> dateDisponibilite = dateDisponibilite.plusDays(1);
+                case SUNDAY -> dateDisponibilite = dateDisponibilite.plusDays(1);
+            }
+        }
+        switch(dateDisponibilite.getDayOfWeek()) {
+            case SATURDAY ->  dateDisponibilite = dateDisponibilite.plusDays(2);
+            case SUNDAY ->  dateDisponibilite = dateDisponibilite.plusDays(1);
+        }
+        return dateDisponibilite;
+    }
+
+    public ArrayList<Livre> getListeBrise() {
         return this.listeBrise;
     }
 
     // pas sync car SaveLoad.load() est déja sync et unique appelleur de cette méthode
-    public void setListeBrise(ArrayList<Emprunt> listeBrise) {
+    public void setListeBrise(ArrayList<Livre> listeBrise) {
         this.listeBrise = listeBrise;
     }
 
-    public synchronized void livreRepare(Emprunt emprunt) {
-        this.listeBrise.remove(emprunt);
-        this.listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.DISPONIBLE);
-        this.listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.USE);
-        this.listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setAEteRepare(true);
+    public synchronized void livreRepare(Livre livre) {
+        this.listeBrise.remove(livre);
+        this.listeLivres.get(listeLivres.indexOf(livre)).setStatut(Statut.DISPONIBLE);
+        this.listeLivres.get(listeLivres.indexOf(livre)).setEtatPhisique(EtatPhisique.USE);
+        this.listeLivres.get(listeLivres.indexOf(livre)).setAEteRepare(true);
     }
 
     // ################## FILTRES ##################

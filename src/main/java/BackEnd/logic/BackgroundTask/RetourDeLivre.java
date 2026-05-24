@@ -46,10 +46,12 @@ public class RetourDeLivre implements  Runnable {
         }
 
         copie.forEach(emprunt -> {
-            if (!retard()) {
-                bibliotheque.retourDeLivre(emprunt);
-            } else {
-                emprunt.addRetard();
+            if (!emprunt.getDateRetour().isAfter(LocalDate.now())) {
+                if (!retard()) {
+                    bibliotheque.retourDeLivre(emprunt);
+                } else {
+                    emprunt.addRetard();
+                }
             }
         });
         dernierScan = LocalDate.now();

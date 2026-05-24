@@ -65,7 +65,7 @@ public class SaveLoad {
                 }.getType()));
                 bibliotheque.setListeUsager(gson.fromJson(json.get("usager"), new TypeToken<ArrayList<Usager>>() {
                 }.getType()));
-                bibliotheque.setListeBrise(gson.fromJson(json.get("livreBrise"), new TypeToken<ArrayList<Livre>>() {
+                bibliotheque.setListeBrise(gson.fromJson(json.get("livreBrise"), new TypeToken<ArrayList<Emprunt>>() {
                 }.getType()));
                 bibliotheque.setTotalEmprunt(new AtomicInteger(json.get("totalEmprunt").getAsInt()));
                 Usager.setCount(new AtomicInteger(json.get("userCount").getAsInt()));

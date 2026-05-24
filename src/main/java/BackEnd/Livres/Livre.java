@@ -1,6 +1,7 @@
 package BackEnd.Livres;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Comparator;
 
 public class Livre implements Comparable<Livre>, Serializable {
@@ -13,6 +14,7 @@ public class Livre implements Comparable<Livre>, Serializable {
     private Statut statut;
     private EtatPhisique etatPhisique;
     private boolean AEteRepare = false;
+    private LocalDate dateDisponibilite;
 
     public  Livre(String titre, String auteur, String ISBN, int id, Statut statut, EtatPhisique etatPhisique) {
         this.titre = titre;
@@ -61,6 +63,14 @@ public class Livre implements Comparable<Livre>, Serializable {
 
     public void setAEteRepare(boolean aEteRepare) {
         this.AEteRepare = aEteRepare;
+    }
+
+    public LocalDate getDateDisponibilite() {
+        return this.dateDisponibilite;
+    }
+
+    public void setDateDisponibilite(LocalDate dateDisponibilite) {
+        this.dateDisponibilite = dateDisponibilite;
     }
 
     @Override
