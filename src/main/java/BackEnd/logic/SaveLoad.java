@@ -28,7 +28,7 @@ public class SaveLoad {
                 .create();
     }
 
-    static synchronized void save(Bibliotheque bibliotheque, RetourDeLivre retour, ReparationTerminer reparation) throws IOException{
+    public static synchronized void save(Bibliotheque bibliotheque, RetourDeLivre retour, ReparationTerminer reparation) throws IOException{
         Gson gson = buildGson();
 
         // objet pour encapsuler tout les object à sauvegarder
@@ -48,7 +48,7 @@ public class SaveLoad {
         }
     }
 
-    static synchronized boolean load(Bibliotheque bibliotheque, RetourDeLivre retour, ReparationTerminer reparation) throws IOException {
+    public static synchronized boolean load(Bibliotheque bibliotheque, RetourDeLivre retour, ReparationTerminer reparation) throws IOException {
         File file = new File("bibliotheque.json");
         if (file.exists()) {
 
