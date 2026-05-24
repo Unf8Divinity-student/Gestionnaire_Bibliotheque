@@ -4,6 +4,8 @@ import BackEnd.Bibliotheque;
 import BackEnd.Emprunt;
 import BackEnd.Livres.Livre;
 import BackEnd.Usager.Usager;
+import BackEnd.logic.BackgroundTask.ReparationTerminer;
+import BackEnd.logic.BackgroundTask.RetourDeLivre;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
