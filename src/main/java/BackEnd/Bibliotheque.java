@@ -41,13 +41,14 @@ public class Bibliotheque implements Serializable {
         this.totalEmprunt = totalEmprunt;
     }
 
+
     // ######### methode listeUsager #########
     public ArrayList<Usager> getListeUsager() {
         return this.listeUsager;
     }
 
     // pas sync car SaveLoad.load() est déja sync et unique appelleur de cette méthode
-    public void setListeUsager(ArrayList<Usager> listeUsager) {
+    public synchronized void setListeUsager(ArrayList<Usager> listeUsager) {
         this.listeUsager = listeUsager;
     }
 
@@ -59,8 +60,14 @@ public class Bibliotheque implements Serializable {
         }
     }
 
+    public synchronized void modifierUser(Usager user, String nom) {
+        user.setNom(nom);
+    }
+
     public synchronized void deleteUser(Usager user) {
-        listeUsager.remove(user);
+        if (user.getNombreEmprunt() == 0) {
+            listeUsager.remove(user);
+        }
     }
 
     // ######### methode listeLivre #########
@@ -83,6 +90,37 @@ public class Bibliotheque implements Serializable {
         this.listeLivres = listeLivres;
     }
 
+    public synchronized void addLivre(String titre, String auteur, String ISBN, int id) {
+        this.listeLivres.add(new Livre(titre, auteur, ISBN, id, Statut.DISPONIBLE, EtatPhisique.NEUF));
+    }
+
+    public synchronized void modifierLivre(Livre livre, Statut statut, EtatPhisique etatPhisique) {
+        livre.setStatut(statut);
+        livre.setEtatPhisique(etatPhisique);
+    }
+
+    public synchronized void deleteLivre(Livre livre) {
+        boolean nonEmprunte = listeEmprunt.stream()
+                .noneMatch(l -> l.getLivre().equals(livre));
+        if (nonEmprunte) {
+            this.listeLivres.remove(livre);
+        }
+    }
+
+    // tout livre = emprunt -> date retour
+    public Optional<LocalDate> obtenirDateRetour(Livre livre) {
+        String ISBN =  livre.getISBN();
+        Optional<LocalDate> dateDispo;
+        List<Livre> toutLesExemplaire = this.listeLivres.stream()
+                .filter(l -> l.getISBN().equals(ISBN))
+                .toList();
+
+        if (toutLesExemplaire.stream().allMatch(l -> l.getStatut() != Statut.DISPONIBLE)) {
+            return toutLesExemplaire.stream().map(Livre::getDateDisponibilite).max(Comparator.naturalOrder());
+        }
+
+        return Optional.empty();
+    }
 
     // ######### gestion d'emprunt #########
 
@@ -101,6 +139,7 @@ public class Bibliotheque implements Serializable {
             LocalDate today = LocalDate.now();
 
             listeLivres.get(listeLivres.indexOf(livre)).setStatut(Statut.EMPRUNTE);
+            listeLivres.get(listeLivres.indexOf(livre)).setDateDisponibilite(dateDeRetour(user));
             listeEmprunt.add(new Emprunt(livre, user, today, dateDeRetour(user), 0));
             user.addNombreEmprunt();
             totalEmprunt.getAndIncrement();
@@ -123,9 +162,7 @@ public class Bibliotheque implements Serializable {
 
     // calcul de condition d'emprunt
     public boolean peuxEmprunter(Livre livre, Usager user) {
-        List<Emprunt> listeEmpruntUser = listeEmprunt.stream().filter(e -> e.getUser() == user).toList(); // donne la liste d'emprunt de l'usager
-
-        return (listeEmpruntUser.size() < user.getLimiteEmprunt() && pasDeRetard(user) && pasDejaEmprunt(livre, user) && livre.getStatut() == Statut.DISPONIBLE);
+        return (user.getNombreEmprunt() < user.getLimiteEmprunt() && pasDeRetard(user) && pasDejaEmprunt(livre, user) && livre.getStatut() == Statut.DISPONIBLE);
     }
 
     // détermine si user à un retard de retour
@@ -151,6 +188,7 @@ public class Bibliotheque implements Serializable {
     public synchronized void retourDeLivre(Emprunt emprunt) {
         if (!estBrise()) {
             listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setStatut(Statut.DISPONIBLE);
+            listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setDateDisponibilite(null);
             if (emprunt.getLivre().getAEteRepare()) {
                 listeLivres.get(listeLivres.indexOf(emprunt.getLivre())).setEtatPhisique(EtatPhisique.USE);
             } else {
@@ -170,9 +208,9 @@ public class Bibliotheque implements Serializable {
         // générateur de bris
     private boolean estBrise() {
         Random random = new Random();
-        int nb = random.nextInt(1, 11);
+        int nb = random.nextInt(10);
 
-        return nb == 1; // 10% de chance de tomber sur 1
+        return nb == 0; // 10% de chance de tomber sur 1
     }
 
         // calcul dateDisponibilite apres bris

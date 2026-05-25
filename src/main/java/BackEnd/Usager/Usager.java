@@ -1,8 +1,9 @@
 package BackEnd.Usager;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class Usager {
+public class Usager implements Serializable {
     static private AtomicInteger count = new AtomicInteger(0);
 
     private int id;
@@ -34,6 +35,10 @@ public class Usager {
 
     public String getNom() {
         return nom;
+    }
+
+    public synchronized void setNom(String nom) {
+        this.nom = nom;
     }
 
     public int getLimiteEmprunt() {
