@@ -24,7 +24,7 @@ public class Bibliotheque implements Serializable {
     private ArrayList<Emprunt> listeEmprunt;
     private ArrayList<Livre> listeBrise;
 
-    public Bibliotheque() throws IOException {
+    public Bibliotheque() {
         this.listeLivres = new ArrayList<>();
         this.listeUsager = new ArrayList<>();
         this.listeEmprunt = new ArrayList<>();
