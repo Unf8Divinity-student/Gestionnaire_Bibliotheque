@@ -37,7 +37,7 @@ public class Emprunt implements Serializable {
         return this.dateRetour;
     }
 
-    public void setDateRetour(LocalDate dateRetour) {
+    public synchronized void setDateRetour(LocalDate dateRetour) {
         this.dateRetour = dateRetour;
     }
 

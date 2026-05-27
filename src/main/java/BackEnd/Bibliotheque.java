@@ -108,7 +108,7 @@ public class Bibliotheque implements Serializable {
     }
 
     // tout livre = emprunt -> date retour
-    public Optional<LocalDate> obtenirDateRetour(Livre livre) {
+    public LocalDate obtenirDateRetour(Livre livre) {
         String ISBN =  livre.getISBN();
         Optional<LocalDate> dateDispo;
         List<Livre> toutLesExemplaire = this.listeLivres.stream()
@@ -116,10 +116,9 @@ public class Bibliotheque implements Serializable {
                 .toList();
 
         if (toutLesExemplaire.stream().allMatch(l -> l.getStatut() != Statut.DISPONIBLE)) {
-            return toutLesExemplaire.stream().map(Livre::getDateDisponibilite).max(Comparator.naturalOrder());
-        }
-
-        return Optional.empty();
+            dateDispo = toutLesExemplaire.stream().map(Livre::getDateDisponibilite).min(Comparator.naturalOrder());
+        } else { return LocalDate.now(); }
+        return dateDispo.orElseGet(LocalDate::now);
     }
 
     // ######### gestion d'emprunt #########
@@ -254,7 +253,7 @@ public class Bibliotheque implements Serializable {
     public final List<Livre> PAR_TITRE(String titre) {
         return this.listeLivres.stream()
                 .parallel()
-                .filter(e -> Objects.equals(e.getTitre().toLowerCase(), titre.toLowerCase()))
+                .filter(e -> e.getTitre().toLowerCase().contains(titre.toLowerCase()))
                 .sorted()
                 .toList();
     }
@@ -263,7 +262,7 @@ public class Bibliotheque implements Serializable {
     public final List<Livre> PAR_AUTEUR(String auteur) {
         return this.listeLivres.stream()
                 .parallel()
-                .filter(e -> Objects.equals(e.getAuteur().toLowerCase(), auteur.toLowerCase()))
+                .filter(e -> e.getAuteur().toLowerCase().contains(auteur.toLowerCase()))
                 .sorted()
                 .toList();
     }

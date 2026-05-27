@@ -61,7 +61,7 @@ public class Livre implements Comparable<Livre>, Serializable {
         return this.AEteRepare;
     }
 
-    public void setAEteRepare(boolean aEteRepare) {
+    public synchronized void setAEteRepare(boolean aEteRepare) {
         this.AEteRepare = aEteRepare;
     }
 
@@ -69,7 +69,7 @@ public class Livre implements Comparable<Livre>, Serializable {
         return this.dateDisponibilite;
     }
 
-    public void setDateDisponibilite(LocalDate dateDisponibilite) {
+    public synchronized void setDateDisponibilite(LocalDate dateDisponibilite) {
         this.dateDisponibilite = dateDisponibilite;
     }
 
