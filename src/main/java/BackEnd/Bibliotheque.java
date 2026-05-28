@@ -244,6 +244,7 @@ public class Bibliotheque implements Serializable {
         this.listeLivres.get(listeLivres.indexOf(livre)).setStatut(Statut.DISPONIBLE);
         this.listeLivres.get(listeLivres.indexOf(livre)).setEtatPhisique(EtatPhisique.USE);
         this.listeLivres.get(listeLivres.indexOf(livre)).setAEteRepare(true);
+        this.listeLivres.get(listeLivres.indexOf(livre)).setDateDisponibilite(null);
     }
 
     // ################## FILTRES ##################
