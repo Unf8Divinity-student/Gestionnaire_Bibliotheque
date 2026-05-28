@@ -58,7 +58,9 @@ class ReparationTerminerTest {
         Livre livreTest = bib.getListeLivres().get(0);
         Livre livreTest2 = bib.getListeLivres().get(1);
 
-        Thread task1 = new Thread(() -> new ReparationTerminer(bib).run());
+        ReparationTerminer reparation = new ReparationTerminer(bib);
+
+        Thread task1 = new Thread(reparation);
         task1.start();
         try {
             task1.join(); // finir la tache avant le test
@@ -78,5 +80,7 @@ class ReparationTerminerTest {
         assertEquals(Statut.A_REPARER, livreTest2.getStatut());
         assertEquals(EtatPhisique.A_REPARER, livreTest2.getEtatPhisique());
         assertFalse(livreTest2.getAEteRepare());
+
+        assertEquals(LocalDate.now(), reparation.getDernierScan());
     }
 }
