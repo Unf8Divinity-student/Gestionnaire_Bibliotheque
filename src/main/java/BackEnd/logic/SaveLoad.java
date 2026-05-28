@@ -3,7 +3,10 @@ package BackEnd.logic;
 import BackEnd.Bibliotheque;
 import BackEnd.Emprunt;
 import BackEnd.Livres.Livre;
+import BackEnd.Usager.Etudiant;
+import BackEnd.Usager.Professeur;
 import BackEnd.Usager.Usager;
+import BackEnd.Usager.Visiteur;
 import BackEnd.logic.BackgroundTask.ReparationTerminer;
 import BackEnd.logic.BackgroundTask.RetourDeLivre;
 import com.google.gson.*;
@@ -19,12 +22,33 @@ public class SaveLoad {
 
     // custum GsonBuilder pour LocalDate (non sérialisable)
     private static Gson buildGson() {
+
         return new GsonBuilder()
                 .setPrettyPrinting()
+
+                // custom LocalDate serialization
                 .registerTypeAdapter(LocalDate.class, (JsonSerializer<LocalDate>)
                         (date, type, ctx) -> new JsonPrimitive(date.toString()))
                 .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>)
                         (json, type, ctx) -> LocalDate.parse(json.getAsJsonPrimitive().getAsString()))
+
+                //custom Usager subClasses serialization
+                .registerTypeAdapter(Usager.class, (JsonSerializer<Usager>) (usager, type, ctx) -> {
+                    JsonObject obj = ctx.serialize(usager, usager.getClass()).getAsJsonObject();
+                    obj.addProperty("type", usager.getClass().getSimpleName());
+                    return obj;
+                })
+                .registerTypeAdapter(Usager.class, (JsonDeserializer<Usager>) (json, type, ctx) -> {
+                    JsonObject obj = json.getAsJsonObject();
+                    String typeUsager = obj.get("type").getAsString();
+                    return switch (typeUsager) {
+                        case "Etudiant" -> ctx.deserialize(obj, Etudiant.class);
+                        case "Professeur" -> ctx.deserialize(obj, Professeur.class);
+                        case "Visiteur" -> ctx.deserialize(obj, Visiteur.class);
+                        default -> throw new JsonParseException("Type inconnu : " + typeUsager);
+                    };
+                })
+
                 .create();
     }
 
@@ -35,7 +59,7 @@ public class SaveLoad {
         JsonObject data = new JsonObject();
         data.add("livres", gson.toJsonTree(bibliotheque.getListeLivres()));
         data.add("emprunt", gson.toJsonTree(bibliotheque.getListeEmprunt()));
-        data.add("usager", gson.toJsonTree(bibliotheque.getListeUsager()));
+        data.add("usager", gson.toJsonTree(bibliotheque.getListeUsager(), new TypeToken<ArrayList<Usager>>(){}.getType()));
         data.add("livreBrise", gson.toJsonTree(bibliotheque.getListeBrise()));
         data.addProperty("totalEmprunt", bibliotheque.getTotalEmprunt());
         data.addProperty("userCount", Usager.getCount());
@@ -65,7 +89,7 @@ public class SaveLoad {
                 }.getType()));
                 bibliotheque.setListeUsager(gson.fromJson(json.get("usager"), new TypeToken<ArrayList<Usager>>() {
                 }.getType()));
-                bibliotheque.setListeBrise(gson.fromJson(json.get("livreBrise"), new TypeToken<ArrayList<Emprunt>>() {
+                bibliotheque.setListeBrise(gson.fromJson(json.get("livreBrise"), new TypeToken<ArrayList<Livre>>() {
                 }.getType()));
                 bibliotheque.setTotalEmprunt(new AtomicInteger(json.get("totalEmprunt").getAsInt()));
                 Usager.setCount(new AtomicInteger(json.get("userCount").getAsInt()));

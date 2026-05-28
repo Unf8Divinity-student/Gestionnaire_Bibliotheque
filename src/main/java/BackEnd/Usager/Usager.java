@@ -60,4 +60,9 @@ public class Usager implements Serializable {
     public int getDureeEmprunt() {
         return dureeEmprunt;
     }
+
+    @Override
+    public String toString() {
+        return String.format("ID: %d - %s : %s", id, nom, this.getClass().getSimpleName());
+    }
 }

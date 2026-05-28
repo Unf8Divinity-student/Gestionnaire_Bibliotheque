@@ -48,4 +48,9 @@ public class Emprunt implements Serializable {
     public void addRetard() {
         this.retard++;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Titre: %s [%s] #%d | ID: %d - %s | Emprunt: %s - Retour: %s | Retard: %d jours",this.getLivre().getTitre(),this.getLivre().getISBN(),this.getLivre().getId(),this.getUser().getId(),this.getUser().getNom(),this.getDateEmprunt(),this.getDateRetour(), this.getRetard());
+    }
 }
